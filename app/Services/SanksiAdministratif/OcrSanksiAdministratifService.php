@@ -357,15 +357,17 @@ class OcrSanksiAdministratifService
     {
         $tempDir = sys_get_temp_dir();
         $prefix = 'ocr_sanksi_' . uniqid();
-        $outputBase = $tempDir . '\\' . $prefix;
-        $pdfWin = str_replace('/', '\\', $pdfPath);
-        $cmd = sprintf('"%s" -png -r 300 "%s" "%s"', $this->popplerBinary, $pdfWin, $outputBase);
+        $isWin = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        $sep = $isWin ? '\\' : '/';
+        $outputBase = rtrim($tempDir, '/\\') . $sep . $prefix;
+        $pdfArg = $isWin ? str_replace('/', '\\', $pdfPath) : $pdfPath;
+        $cmd = sprintf('"%s" -png -r 300 "%s" "%s"', $this->popplerBinary, $pdfArg, $outputBase);
         exec($cmd . ' 2>&1', $output, $rc);
         if ($rc !== 0) {
             Log::warning('pdftoppm sanksi failed', ['cmd' => $cmd, 'rc' => $rc, 'output' => $output]);
             return '';
         }
-        $images = glob($tempDir . '\\' . $prefix . '*.png');
+        $images = glob(rtrim($tempDir, '/\\') . $sep . $prefix . '*.png');
         if (empty($images)) {
             Log::warning('pdftoppm sanksi tidak menghasilkan gambar', ['cmd' => $cmd]);
             return '';
@@ -389,8 +391,9 @@ class OcrSanksiAdministratifService
 
     private function tesseractOcr(string $filePath): string
     {
-        $filePathWin = str_replace('/', '\\', $filePath);
-        $cmd = sprintf('"%s" "%s" stdout -l %s', $this->tesseractBinary, $filePathWin, $this->language);
+        $isWin = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        $fileArg = $isWin ? str_replace('/', '\\', $filePath) : $filePath;
+        $cmd = sprintf('"%s" "%s" stdout -l %s', $this->tesseractBinary, $fileArg, $this->language);
         exec($cmd . ' 2>&1', $output, $rc);
         if ($rc !== 0) {
             Log::error('tesseract sanksi failed', ['cmd' => $cmd, 'rc' => $rc, 'output' => $output]);
