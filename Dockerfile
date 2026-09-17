@@ -13,15 +13,18 @@ RUN npm run build || echo "vite build skipped"
 FROM php:8.2-fpm-bookworm
 
 # System deps + Tesseract (ind+eng) + Poppler (pdftoppm)
+# libsqlite3-dev + pkg-config wajib untuk pdo_sqlite (error: Package 'sqlite3' not found)
+# file + openssl untuk entrypoint (deteksi CRLF & fallback key)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git curl zip unzip \
+    git curl zip unzip pkg-config file openssl \
     libpng-dev libonig-dev libxml2-dev libzip-dev \
     libfreetype6-dev libjpeg62-turbo-dev \
+    libsqlite3-dev \
     tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind \
     poppler-utils \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-        pdo pdo_mysql pdo_sqlite \
+        pdo pdo_sqlite \
         mbstring exif pcntl bcmath gd zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
