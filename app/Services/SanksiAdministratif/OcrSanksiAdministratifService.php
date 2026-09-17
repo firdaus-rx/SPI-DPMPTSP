@@ -341,14 +341,38 @@ class OcrSanksiAdministratifService
         }
         if ($ext === 'pdf') {
             $textLayer = $this->tryPdftotext($filePath);
-            if (strlen(trim($textLayer)) > 500) {
+            if ($this->isMeaningfulPdfText($textLayer)) {
                 Log::info('pdftotext dipakai (tanpa OCR)', ['chars' => strlen($textLayer)]);
                 $this->confidence = 95.0;
                 return $textLayer;
             }
+            if (strlen(trim($textLayer)) > 0) {
+                Log::info('pdftotext diabaikan (tidak bermakna)', ['chars' => strlen($textLayer), 'preview' => mb_substr($textLayer, 0, 300)]);
+            }
             return $this->extractFromPdf($filePath);
         }
         return '';
+    }
+
+    private function isMeaningfulPdfText(string $text): bool
+    {
+        $t = trim($text);
+        if (strlen($t) < 500) return false;
+        // PDF scan dengan pdftotext -layout menghasilkan gibberish ikon — harus ada anchor sanksi
+        $hasAnchor = str_contains($t, 'Kelurahan:') || str_contains($t, 'Kecamatan:') || str_contains($t, 'Alamat:') || str_contains($t, 'Dalam Negeri');
+        $hasNib = false;
+        // Cek ada 11-13 digit (tanpa regex berat — scan manual)
+        $len = strlen($t);
+        $digitRun = 0;
+        for ($i = 0; $i < $len; $i++) {
+            if (ctype_digit($t[$i])) { $digitRun++; if ($digitRun >= 11) { $hasNib = true; break; } }
+            else $digitRun = 0;
+        }
+        // Hitung proporsi alfanumerik vs gibberish
+        $alpha = 0;
+        for ($i = 0; $i < min($len, 2000); $i++) if (ctype_alpha($t[$i])) $alpha++;
+        if ($alpha < 100) return false;
+        return $hasAnchor || $hasNib;
     }
 
     private function tryPdftotext(string $pdfPath): string
