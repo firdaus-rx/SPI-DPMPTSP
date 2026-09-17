@@ -4,7 +4,7 @@ services:
     container_name: spi-dpmptsp-app
     restart: unless-stopped
     ports:
-      - "${APP_PORT:-8050}:8000"
+      - "${APP_PORT:-8050}:${APP_PORT:-8050}"
     env_file:
       - .env
     environment:
