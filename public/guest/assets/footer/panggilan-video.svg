@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="27.029" height="27.029" viewBox="0 0 27.029 27.029">
+  <g id="PANGGILAN_VIDEO" data-name="PANGGILAN VIDEO" transform="translate(0 -0.568)">
+    <rect id="Rectangle_177" data-name="Rectangle 177" width="27.029" height="27.03" rx="6" transform="translate(0.001 0.567)" fill="#fff"/>
+    <g id="PANGGILAN_VIDEO_ICON_A" data-name="PANGGILAN VIDEO ICON A" transform="translate(5.701 6.27)">
+      <rect id="Rectangle_3899" data-name="Rectangle 3899" width="15.624" height="15.624" transform="translate(0 0)" fill="#fff" opacity="0"/>
+      <g id="Group_8044" data-name="Group 8044" transform="translate(0 2.729)">
+        <g id="Group_7954" data-name="Group 7954" transform="translate(0 0)">
+          <g id="Group_7953" data-name="Group 7953" transform="translate(0)">
+            <path id="Path_17962" data-name="Path 17962" d="M172.2,764.409h-8.548a1.6,1.6,0,0,1-1.6-1.6v-7.053a1.6,1.6,0,0,1,1.6-1.6H172.2a1.6,1.6,0,0,1,1.6,1.6v.672l2.593-1.4a.871.871,0,0,1,1.285.767v6.972a.871.871,0,0,1-1.285.767l-2.593-1.4v.672A1.6,1.6,0,0,1,172.2,764.409Zm-8.548-9.048a.4.4,0,0,0-.4.4v7.053a.4.4,0,0,0,.4.4H172.2a.4.4,0,0,0,.4-.4v-2.689l3.878,2.091v-5.857l-3.878,2.091v-2.689a.4.4,0,0,0-.4-.4Z" transform="translate(-162.049 -754.157)" fill="#9b1f15"/>
+          </g>
+        </g>
+        <rect id="Rectangle_3896" data-name="Rectangle 3896" width="1.204" height="4.181" rx="0.403" transform="translate(2.104 3.035)" fill="#9b1f15"/>
+      </g>
+    </g>
+  </g>
+</svg>

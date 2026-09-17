@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>OSS RBA - Sistem Perizinan Berusaha Terintegrasi Secara Elektronik</title>
+  <meta name="description"
+    content="Sistem perizinan berusaha yang terintegrasi secara elektronik untuk mempermudah pelaku usaha mengurus perizinan. OSS bertujuan untuk mengurangi waktu dan birokrasi dalam proses perizinan usaha" />
+  <meta name="theme-color" content="black" />
+  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+
+  <link rel="stylesheet" href="assets/montserrat.css" />
+  <link rel="stylesheet" href="assets/material-symbols-outlined.css" />
+  <link rel="stylesheet" href="assets/tabler-icons.css" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Montserrat', 'system-ui', 'sans-serif'] },
+          colors: {
+            'oss-base-black': '#0F172A',
+            'oss-base-white': '#FFFFFF',
+            'oss-gray-25': '#F9FAFB',
+            'oss-gray-200': '#E5E7EB',
+            'oss-gray-300': '#D1D5DB',
+            'oss-gray-500': '#6B7280',
+            'oss-gray-600': '#4B5563',
+            'oss-blue-500': '#00479B',
+            'oss-blue-600': '#003B80',
+            'oss-red-600': '#B91C1C',
+            'primary': '#00479B',
+          },
+          maxWidth: { '1920': '1920px' },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Montserrat', system-ui, sans-serif;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    /* Focus-visible — must not be hidden */
+    :where(a, button, input, [tabindex]):focus-visible {
+      outline: 2px solid #00479B;
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .gradient-left,
+    .gradient-right {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 80px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .gradient-left {
+      left: 0;
+      background: linear-gradient(to right, #fff, transparent);
+    }
+
+    .gradient-right {
+      right: 0;
+      background: linear-gradient(to left, #fff, transparent);
+    }
+
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @keyframes marquee {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-100%);
+      }
+    }
+
+    .marquee-track {
+      animation: marquee 60s linear infinite;
+      will-change: transform;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .marquee-track {
+        animation: none;
+      }
+    }
+
+    .font-system {
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    }
+
+    .slider-track {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      animation: slide 12s ease-in-out infinite;
+    }
+
+    .slider-slide {
+      position: relative;
+      flex: 0 0 100%;
+      min-width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    @keyframes slide {
+      0%, 45%   { transform: translateX(0); }
+      55%, 95%  { transform: translateX(-100%); }
+      100%      { transform: translateX(0); }
+    }
+
+    .slider-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.4);
+      transition: background 200ms;
+    }
+
+    .slider-dot[aria-current="true"] {
+      background: #00479B;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .slider-track { animation: none; }
+    }
+  </style>
+</head>
+
+<body class="bg-white text-oss-base-black min-h-screen">
+
+  <!-- ===================== HEADER (exact replica of oss.go.id/id) ===================== -->
+
+  <!-- 1. Top yellow announcement bar -->
+  <div class="bg-yellow-500">
+    <div class="mx-auto max-w-1920 px-4 sm:px-10 md:px-16 lg:px-24 xl:px-32">
+      <div class="mx-0 grid grid-flow-row grid-cols-12 items-center gap-4 py-2">
+        <div class="col-span-11 flex items-center">
+          <span class="material-symbols-outlined" aria-hidden="true">campaign</span>
+          <div class="ml-4 text-start text-xs font-semibold">
+            <p>Bagi Pelaku Usaha yang memiliki data proyek transisi sebelum penerapan PP 28 (5 Oktober 2025) dengan
+              persyaratan tata ruang telah terbit namun perizinan berusahanya belum rampung, silakan mengakses panduan
+              <a title="Pengajuan Perizinan Berusaha (Data Lama)"
+                href="https://oss.go.id/id/panduan/6940c6d3f9a056e7711219eb" class="hover:underline">Pengajuan Perizinan
+                Berusaha (Data Lama).</a>
+            </p>
+          </div>
+        </div>
+        <button type="button" aria-label="Tutup pengumuman"
+          class="col-span-1 ml-auto cursor-pointer ti ti-x text-lg"></button>
+      </div>
+    </div>
+  </div>
+
+  <header class="relative z-50 border-b border-oss-gray-25 bg-oss-gray-25 py-4">
+    <div
+      class="mx-auto max-w-[1920px] px-4 sm:px-10 md:px-16 lg:px-24 xl:px-32 3xl:px-36 4xl:px-40 mx-auto flex items-center justify-between"
+      bis_skin_checked="1">
+      <div class="flex items-center space-x-2" bis_skin_checked="1"><span class="ti ti-device-mobile"></span>
+        <div class="text-sm font-normal text-oss-base-black hover:cursor-pointer hover:underline" bis_skin_checked="1">
+          Download Aplikasi OSS</div>
+      </div>
+      <div class="flex items-center space-x-6" bis_skin_checked="1">
+        <div class="relative inline-block text-left " bis_skin_checked="1"><button
+            class="flex items-center space-x-2 text-oss-blue-500 hover:text-blue-800 focus:outline-none"><span
+              class="ti ti-language text-xl"></span><span class="text-sm font-semibold uppercase">id</span><span
+              class="ti text-xl ti-chevron-down"></span></button></div>
+        <div class="relative inline-block text-left" bis_skin_checked="1">
+          <div class="flex items-center text-sm font-semibold text-oss-blue-500" bis_skin_checked="1"><span
+              class="hover:underline">Bantuan</span><span
+              class="ti ml-1 hidden text-xl ti-chevron-down lg:block"></span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Sticky white navbar (h-72px) -->
+  <header class="sticky top-0 z-30 bg-white shadow" style="height:72px">
+    <div class="mx-auto max-w-1920 px-4 sm:px-10 md:px-16 lg:px-24 xl:px-32">
+      <div class="flex h-[72px] items-center justify-between gap-3">
+
+        <!-- Logo -->
+        <a href="https://oss.go.id/id" class="flex shrink-0 items-center" aria-label="OSS RBA beranda">
+          <img src="assets/oss-logo.svg" alt="OSS RBA" class="h-8 md:h-9 w-auto" />
+        </a>
+
+        <!-- Main nav -->
+        <nav aria-label="Navigasi utama" class="hidden lg:flex items-center gap-1">
+          <a href="https://oss.go.id/id"
+            class="px-3 py-2 text-sm font-semibold text-oss-base-black hover:text-oss-blue-500 transition duration-200">Beranda</a>
+          <button type="button"
+            class="px-3 py-2 text-sm font-semibold text-oss-base-black hover:text-oss-blue-500 transition duration-200 inline-flex items-center gap-1"
+            aria-haspopup="true" aria-expanded="false">
+            Informasi
+            <span class="ti ti-chevron-down text-base" aria-hidden="true"></span>
+          </button>
+          <a href="#"
+            class="px-3 py-2 text-sm font-semibold text-oss-base-black hover:text-oss-blue-500 transition duration-200">Perizinan</a>
+          <a href="#"
+            class="px-3 py-2 text-sm font-semibold text-oss-base-black hover:text-oss-blue-500 transition duration-200">Pengawasan</a>
+        </nav>
+
+        <!-- Right actions -->
+        <div class="flex items-center gap-2">
+          <a href="https://ui-login.oss.go.id/login/v1?as=pelapor" target="_blank" rel="noreferrer"
+            class="hidden sm:inline-flex items-center px-4 py-2 text-sm font-semibold rounded-md border border-oss-blue-500 text-oss-blue-500 hover:bg-oss-blue-500 hover:text-white transition duration-200">Masuk</a>
+          <a href="https://ui-login.oss.go.id/login/v1?as=pelapor" target="_blank" rel="noreferrer"
+            class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-md bg-oss-blue-500 text-white hover:bg-oss-blue-600 transition duration-200">Daftar</a>
+
+          <!-- Mobile menu trigger -->
+          <button type="button" aria-label="Buka menu"
+            class="lg:hidden ml-1 p-2 rounded-md text-oss-base-black hover:text-oss-blue-500">
+            <span class="ti ti-menu-2 text-xl" aria-hidden="true"></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== MAIN ===================== -->
+  <main>
+
+    <!-- Hero -->
+    <section aria-labelledby="hero-title" class="relative overflow-hidden bg-oss-red-600 py-16 md:py-24">
+      <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <img src="assets/images/grid-pattern.svg" alt="" class="h-full w-full object-cover opacity-50" />
+        <img src="assets/images/garis-abu.svg" alt=""
+          class="absolute inset-0 h-full w-full object-cover mix-blend-screen opacity-40" />
+        <div class="absolute inset-0 bg-gradient-to-b from-oss-red-600/40 via-transparent to-oss-red-600/40"></div>
+      </div>
+      <div class="relative mx-auto max-w-1920 px-4 sm:px-10 md:px-16 lg:px-24 xl:px-32">
+        <div class="text-center">
+          <p class="text-5xl sm:text-md font-semibold tracking-widest text-white">
+            Sistem Perizinan Berusaha Terintegrasi
+          </p>
+          <h1 id="hero-title"
+            class="mt-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white/90 leading-tight">
+            DPMPTSP Kabupaten Pidie
+          </h1>
+          <p class="font-system mt-4 text-sm sm:text-md md:text-lg font-medium text-white/90">
+            Mudah, Cepat, Tepat, Transparan, dan Akuntabel
+          </p>
+        </div>
+
+        <figure
+          class="absolute right-4 top-1/2 hidden -translate-y-1/2 flex-col items-center gap-3 rounded-2xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/20 md:flex md:max-w-xs text-center">
+          <img src="assets/images/Kepala_DPMPTSP.jpg" alt="Foto Sri Rahayu, S.E - Kepala DPMPTSP Kabupaten Pidie"
+            width="180" height="180" loading="lazy"
+            class="h-36 w-36 md:h-44 md:w-44 shrink-0 rounded-full object-cover ring-4 ring-white/40 shadow-lg" />
+          <figcaption class="text-white space-y-0 leading-[1]">
+            <p class="text-lg md:text-2xl font-bold">Sri Rahayu, S.E</p>
+            <p class="-mb-0 text-xs md:text-sm font-semibold uppercase tracking-wider text-white/70">PLT. Kepala DPMPTSP
+            </p>
+            <p class="font-system text-sm md:text-base text-white/80">Kabupaten Pidie</p>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <div class="mx-auto max-w-1920 px-4 sm:px-10 md:px-16 lg:px-24 xl:px-32">
+
+      <!-- Lancar dan aman kelola usaha dengan NIB -->
+      <section class="bg-transparent py-6 md:flex md:items-center md:justify-between">
+        <div class="md:w-1/2">
+          <div id="nib-slider"
+            class="relative aspect-[3/2] w-full overflow-hidden rounded-lg bg-oss-gray-200 sm:aspect-[16/10]"
+            role="region" aria-roledescription="carousel" aria-label="Slider informasi NIB">
+            <div class="slider-track absolute inset-0">
+              <div class="slider-slide">
+                <img src="assets/images/web-banner.jpg" alt="Wanita mengelola usaha" loading="eager"
+                  class="absolute inset-0 h-full w-full object-cover" />
+              </div>
+              <div class="slider-slide">
+                <img src="assets/images/pidie.jpeg" alt="Pelayanan Terpadu Satu Pintu Pidie" loading="eager"
+                  class="absolute inset-0 h-full w-full object-cover" />
+              </div>
+            </div>
+
+            <div class="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-2 rounded-full bg-black/30 px-2 py-1 backdrop-blur-sm"
+              role="tablist" aria-label="Pilih slide">
+              <button type="button" class="slider-dot" aria-label="Slide 1" aria-current="true"></button>
+              <button type="button" class="slider-dot" aria-label="Slide 2" aria-current="false"></button>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 md:mt-0 md:w-1/2 md:pl-10">
+          <h2 class="text-[36px] font-bold text-primary">
+            Lancar dan aman <span class="text-black">kelola usaha dengan NIB</span>
+          </h2>
+          <p class="mt-4 text-gray-600">
+            Nomor Induk Berusaha (NIB) adalah identitas resmi untuk memulai atau menjalankan usaha di Indonesia.
+            Pengurusannya mudah, jadi semakin percaya diri kembangkan usaha Anda.
+          </p>
+        </div>
+      </section>
+
+      <!-- Sistem Perizinan Berusaha Berbasis Risiko -->
+      <section class="relative py-32">
+        <div class="absolute inset-0">
+          <img src="assets/images/garis-abu.svg" alt="" aria-hidden="true"
+            class="absolute inset-0 h-full w-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-white via-transparent to-white"></div>
+        </div>
+        <div
+          class="relative mx-auto rounded-lg border border-gray-300 bg-white p-8 shadow-md md:flex md:items-center md:justify-between">
+          <div class="absolute inset-0 overflow-hidden rounded-lg">
+            <img src="assets/images/spiral-bg.svg" alt="" aria-hidden="true"
+              class="absolute inset-0 h-full w-full object-cover" />
+          </div>
+          <div class="relative md:w-2/5">
+            <h2 class="text-2xl font-bold text-primary">
+              Sistem Perizinan Berusaha Berbasis Risiko mengelompokkan usaha jadi 4 tingkat risiko yang menentukan izin
+              dan kewajiban usaha yang harus dipenuhi.
+            </h2>
+          </div>
+          <div class="relative mt-6 text-left md:mt-0 md:w-2/5 md:text-right">
+            <p class="mb-4 hidden text-base text-gray-600 md:block">
+              Ingin tahu izin apa yang Anda butuhkan? Cari tahu jenis izin sesuai bidang usaha Anda di sini
+            </p>
+            <a href="https://oss.go.id/kbli"
+              class="inline-block rounded-lg border border-oss-blue-500 bg-white px-4 py-2 font-semibold text-oss-blue-500 transition duration-200 hover:bg-oss-blue-500 hover:text-white">
+              Cek Sekarang
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Berita -->
+      <section class="py-6">
+        <div class="mb-6 flex items-center justify-between">
+          <h2 class="text-lg font-bold text-oss-base-black md:text-xl lg:text-2xl">Berita</h2>
+          <a href="https://oss.go.id/berita"
+            class="flex items-center text-xs font-semibold text-oss-blue-500 md:text-sm lg:text-base">
+            <span class="hover:underline">Lihat Selengkapnya</span>
+            <span class="ti ti-arrow-right ml-1 text-base md:text-xl lg:text-2xl" aria-hidden="true"></span>
+          </a>
+        </div>
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-10">
+          <div class="col-span-1 h-auto w-full md:col-span-6">
+            <a href="https://oss.go.id/berita/memahami-transisi-kbli-2025-dalam-ekosistem-perizinan-berusaha"
+              class="block">
+              <img src="assets/images/ptsp.png" alt="Memahami Transisi KBLI 2025 dalam Ekosistem Perizinan Berusaha"
+                width="1000" height="500" loading="lazy" class="aspect-[16/9] w-full rounded-lg object-cover" />
+              <div class="mt-4">
+                <h4 class="mb-1 line-clamp-2 text-sm font-semibold text-oss-base-black md:text-base lg:text-lg">
+                  Memahami Transisi KBLI 2025 dalam Ekosistem Perizinan Berusaha
+                </h4>
+                <p class="text-xs font-normal text-oss-gray-500 md:text-sm lg:text-base">24 June 2026</p>
+              </div>
+            </a>
+          </div>
+          <div class="col-span-1 flex flex-col justify-between gap-8 md:col-span-6 md:gap-6 lg:gap-8">
+            <a href="https://oss.go.id/berita/partisipasi-perempuan-dalam-perizinan-usaha-terus-menguat"
+              class="flex flex-col md:flex-row md:items-start">
+              <div class="w-full shrink-0 md:w-1/3">
+                <img src="assets/images/nib-gender.jpg" alt="Partisipasi Perempuan dalam Perizinan Usaha Terus Menguat"
+                  width="500" height="250" loading="lazy" class="aspect-[16/9] w-full rounded-lg object-cover" />
+              </div>
+              <div class="mt-4 md:ml-4 md:mt-0 lg:ml-6">
+                <h4 class="mb-1 line-clamp-2 text-sm font-semibold text-oss-base-black md:text-base lg:text-lg">
+                  Partisipasi Perempuan dalam Perizinan Usaha Terus Menguat
+                </h4>
+                <p class="text-xs font-normal text-oss-gray-500 md:text-sm lg:text-base">01 December 2025</p>
+              </div>
+            </a>
+            <a href="https://oss.go.id/berita/maklumat-pelayanan:-komitmen-deputi-bidang-teknologi-informasi-penanaman-modal-untuk-tingkatkan-layanan-publik"
+              class="flex flex-col md:flex-row md:items-start">
+              <div class="w-full shrink-0 md:w-1/3">
+                <img src="assets/images/maklumat.jpeg"
+                  alt="Maklumat Pelayanan: Komitmen Deputi Bidang TI Penanaman Modal" width="500" height="250"
+                  loading="lazy" class="aspect-[16/9] w-full rounded-lg object-cover" />
+              </div>
+              <div class="mt-4 md:ml-4 md:mt-0 lg:ml-6">
+                <h4 class="mb-1 line-clamp-2 text-sm font-semibold text-oss-base-black md:text-base lg:text-lg">
+                  Maklumat Pelayanan: Komitmen Deputi Bidang Teknologi Informasi Penanaman Modal untuk Tingkatkan
+                  Layanan Publik
+                </h4>
+                <p class="text-xs font-normal text-oss-gray-500 md:text-sm lg:text-base">09 September 2025</p>
+              </div>
+            </a>
+            <a href="https://oss.go.id/berita/kejar-pertumbuhan-tinggi,-rosan-optimis-kontribusi-investasi-lebih-besar"
+              class="flex flex-col md:flex-row md:items-start">
+              <div class="w-full shrink-0 md:w-1/3">
+                <img src="assets/images/rosan.webp"
+                  alt="Kejar Pertumbuhan Tinggi, Rosan Optimis Kontribusi Investasi Lebih Besar" width="500"
+                  height="250" loading="lazy" class="aspect-[16/9] w-full rounded-lg object-cover" />
+              </div>
+              <div class="mt-4 md:ml-4 md:mt-0 lg:ml-6">
+                <h4 class="mb-1 line-clamp-2 text-sm font-semibold text-oss-base-black md:text-base lg:text-lg">
+                  Kejar Pertumbuhan Tinggi, Rosan Optimis Kontribusi Investasi Lebih Besar
+                </h4>
+                <p class="text-xs font-normal text-oss-gray-500 md:text-sm lg:text-base">28 August 2024</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pengumuman -->
+      <section class="bg-transparent py-6">
+        <div class="mb-6 flex items-center justify-between">
+          <h2 class="text-lg font-bold text-oss-base-black md:text-xl lg:text-2xl">Pengumuman</h2>
+          <a href="https://oss.go.id/pengumuman"
+            class="flex items-center text-xs font-semibold text-oss-blue-500 md:text-sm lg:text-base">
+            <span class="hover:underline">Lihat Selengkapnya</span>
+            <span class="ti ti-arrow-right ml-1 text-base md:text-xl lg:text-2xl" aria-hidden="true"></span>
+          </a>
+        </div>
+        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <a href="https://oss.go.id/pengumuman/tren-partisipasi-perempuan-dalam-perizinan-berusaha-periode-2021-2025">
+            <div class="border-gray-200 pb-4">
+              <h3 class="line-clamp-2 text-sm font-semibold text-oss-base-black md:text-base lg:text-lg">
+                Tren Partisipasi Perempuan dalam Perizinan Berusaha Periode 2021–2025
+              </h3>
+              <p class="mt-1 text-xs font-normal text-oss-gray-500 md:text-sm lg:text-base">11 May 2026</p>
+            </div>
+          </a>
+          <a
+            href="https://oss.go.id/pengumuman/kemudahan-baru-penerbitan-kkpr-darat-bagi-usaha-mikro-cukup-isi-data-dan-buat-pernyataan-mandiri-di-oss">
+            <div class="border-gray-200 pb-4">
+              <h3 class="line-clamp-2 text-sm font-semibold text-oss-base-black md:text-base lg:text-lg">
+                Kemudahan Baru Penerbitan KKPR Darat Bagi Usaha Mikro Cukup Isi Data dan Buat Pernyataan Mandiri di OSS
+              </h3>
+              <p class="mt-1 text-xs font-normal text-oss-gray-500 md:text-sm lg:text-base">02 March 2026</p>
+            </div>
+          </a>
+          <a
+            href="https://oss.go.id/pengumuman/masa-penataan-izin-pengusahaan-air-tanah-dan-persetujuan-penggunaan-air-tanah-akan-berakhir-pada-31-maret-2026">
+            <div class="border-gray-200 pb-4">
+              <h3 class="line-clamp-2 text-sm font-semibold text-oss-base-black md:text-base lg:text-lg">
+                Masa Penataan Izin Pengusahaan Air Tanah dan Persetujuan Penggunaan Air Tanah akan Berakhir pada 31
+                Maret 2026
+              </h3>
+              <p class="mt-1 text-xs font-normal text-oss-gray-500 md:text-sm lg:text-base">02 March 2026</p>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Video Panduan -->
+      <section aria-labelledby="video-title" class="relative py-10">
+        <div class="mx-auto max-w-1920 px-0">
+          <div class="mb-6 flex items-center justify-between">
+            <h2 id="video-title" class="text-lg font-bold text-oss-base-black md:text-xl lg:text-2xl">Video Panduan</h2>
+            <a href="https://oss.go.id/video"
+              class="flex items-center text-xs font-semibold text-oss-blue-500 md:text-sm lg:text-base">
+              <span class="hover:underline">Lihat Selengkapnya</span>
+              <span class="ti ti-arrow-right ml-1 text-base md:text-xl lg:text-2xl" aria-hidden="true"></span>
+            </a>
+          </div>
+          <div class="no-scrollbar grid gap-6 overflow-x-auto md:grid-cols-3 md:gap-6">
+            <div>
+              <div class="group">
+                <div class="relative aspect-[16/9] w-full">
+                  <img src="assets/images/yt-1.jpg" alt="" loading="lazy"
+                    class="absolute inset-0 h-full w-full rounded-lg object-cover" />
+                  <button type="button" aria-label="Putar video: Panduan Perubahan Data Usaha Pada Sistem OSS"
+                    class="absolute inset-0 m-auto flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-[#E8E8E8] bg-opacity-50 p-4 backdrop-blur-sm">
+                    <span class="ti ti-player-play-filled text-2xl text-white md:text-4xl" aria-hidden="true"></span>
+                  </button>
+                </div>
+                <div class="mt-4 line-clamp-2 text-sm font-semibold text-oss-base-black md:text-base lg:text-lg">
+                  Panduan Perubahan Data Usaha Pada Sistem OSS
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="group">
+                <div class="relative aspect-[16/9] w-full">
+                  <img src="assets/images/yt-2.jpg" alt="" loading="lazy"
+                    class="absolute inset-0 h-full w-full rounded-lg object-cover" />
+                  <button type="button" aria-label="Putar video: Panduan Penambahan Bidang Usaha pada Sistem OSS"
+                    class="absolute inset-0 m-auto flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-[#E8E8E8] bg-opacity-50 p-4 backdrop-blur-sm">
+                    <span class="ti ti-player-play-filled text-2xl text-white md:text-4xl" aria-hidden="true"></span>
+                  </button>
+                </div>
+                <div class="mt-4 line-clamp-2 text-sm font-semibold text-oss-base-black md:text-base lg:text-lg">
+                  Panduan Penambahan Bidang Usaha pada Sistem OSS
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="group">
+                <div class="relative aspect-[16/9] w-full">
+                  <img src="assets/images/yt-3.jpg" alt="" loading="lazy"
+                    class="absolute inset-0 h-full w-full rounded-lg object-cover" />
+                  <button type="button" aria-label="Putar video: Live Demo LKPM untuk Usaha Besar"
+                    class="absolute inset-0 m-auto flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-[#E8E8E8] bg-opacity-50 p-4 backdrop-blur-sm">
+                    <span class="ti ti-player-play-filled text-2xl text-white md:text-4xl" aria-hidden="true"></span>
+                  </button>
+                </div>
+                <div class="mt-4 line-clamp-2 text-sm font-semibold text-oss-base-black md:text-base lg:text-lg">
+                  Live Demo Panduan Pengisian Laporan Kegiatan Penanaman Modal (LKPM) untuk Usaha Besar
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ accordion -->
+      <section class="py-6">
+        <div class="md:flex md:justify-between">
+          <div class="flex shrink-0 flex-col items-start">
+            <span class="material-symbols-outlined text-4xl text-oss-blue-500" aria-hidden="true">help</span>
+            <h2 class="py-4 text-lg font-bold text-oss-base-black md:text-xl lg:text-2xl">Paling Sering Ditanya</h2>
+            <div class="hidden md:block">
+              <a href="https://oss.go.id/faq"
+                class="flex items-center text-xs font-semibold text-oss-blue-500 md:text-sm lg:text-base">
+                <span class="hover:underline">Lihat Selengkapnya</span>
+                <span class="ti ti-arrow-right ml-1 text-base md:text-xl lg:text-2xl" aria-hidden="true"></span>
+              </a>
+            </div>
+          </div>
+          <div id="faq-accordion" class="w-full md:ml-12">
+            <details class="my-5 rounded-xl bg-white border border-gray-200">
+              <summary class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl p-4 font-medium">
+                <span class="text-oss-base-black text-start text-base font-semibold">Apa itu sumber pembiayaan pada
+                  isian data di Sistem OSS?</span>
+                <svg class="h-3 w-3 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 10 6">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M1 1l4 4 4-4"></path>
+                </svg>
+              </summary>
+            </details>
+            <details class="my-5 rounded-xl bg-white border border-gray-200">
+              <summary class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl p-4 font-medium">
+                <span class="text-oss-base-black text-start text-base font-semibold">Bagaimana cara pencabutan likuidasi
+                  akun BUJKA?</span>
+                <svg class="h-3 w-3 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 10 6">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M1 1l4 4 4-4"></path>
+                </svg>
+              </summary>
+            </details>
+            <details class="my-5 rounded-xl bg-white border border-gray-200">
+              <summary class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl p-4 font-medium">
+                <span class="text-oss-base-black text-start text-base font-semibold">Bagaimana cara pencabutan
+                  KPPA?</span>
+                <svg class="h-3 w-3 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 10 6">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M1 1l4 4 4-4"></path>
+                </svg>
+              </summary>
+            </details>
+            <details class="my-5 rounded-xl bg-white border border-gray-200">
+              <summary class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl p-4 font-medium">
+                <span class="text-oss-base-black text-start text-base font-semibold">Saya Tidak Bisa Cabut KPPA karena
+                  Muncul Notifikasi Masa Berlaku LOA Belum Terisi</span>
+                <svg class="h-3 w-3 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 10 6">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M1 1l4 4 4-4"></path>
+                </svg>
+              </summary>
+            </details>
+            <details class="my-5 rounded-xl bg-white border border-gray-200">
+              <summary class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl p-4 font-medium">
+                <span class="text-oss-base-black text-start text-base font-semibold">Bisakah Mengubah Akun Perorangan
+                  Jadi Badan Usaha?</span>
+                <svg class="h-3 w-3 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 10 6">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M1 1l4 4 4-4"></path>
+                </svg>
+              </summary>
+            </details>
+          </div>
+          <div class="flex items-start md:hidden">
+            <a href="https://oss.go.id/faq"
+              class="flex items-center text-xs font-semibold text-oss-blue-500 md:text-sm lg:text-base">
+              <span class="hover:underline">Lihat Selengkapnya</span>
+              <span class="ti ti-arrow-right ml-1 text-base md:text-xl lg:text-2xl" aria-hidden="true"></span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Kementerian marquee -->
+      <section aria-label="Logo kementerian dan lembaga terkait" class="my-20">
+        <div class="relative flex w-full overflow-x-clip overflow-y-visible">
+          <div class="gradient-left" aria-hidden="true"></div>
+          <div class="marquee-track flex min-w-full flex-shrink-0 flex-grow-0 basis-auto flex-row items-center">
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kemenkum.go.id/"><img
+                  src="assets/logos/kemenhukum.svg" alt="Kementerian Hukum" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kebudayaan.kemdikbud.go.id/"><img
+                  src="assets/logos/kemenbud.svg" alt="Kementerian Kebudayaan" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kop.go.id/"><img
+                  src="assets/logos/kemenkop.svg" alt="Kementerian Koperasi" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.bp2mi.go.id/"><img
+                  src="assets/logos/bp2mi.svg" alt="Kementerian Pelindungan Pekerja Migran Indonesia/BP2MI"
+                  loading="lazy" width="100" height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="http://www.kemenpora.go.id/"><img
+                  src="assets/logos/kemenpora.svg" alt="Kementerian Pemuda dan Olahraga" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.kemendikdasmen.go.id/"><img
+                  src="assets/logos/kemendikdasmen.png" alt="Kementerian Pendidikan Dasar dan Menengah" loading="lazy"
+                  width="100" height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.kemhan.go.id/"><img
+                  src="assets/logos/kemhan.png" alt="Kementerian Pertahanan" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://pkp.go.id/"><img
+                  src="assets/logos/pkp.png" alt="Kementerian Perumahan dan Kawasan Permukiman" loading="lazy"
+                  width="100" height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kemensos.go.id/"><img
+                  src="assets/logos/kemensos.svg" alt="Kementerian Sosial" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://umkm.go.id/"><img
+                  src="assets/logos/umkm.svg" alt="Kementerian Usaha Mikro, Kecil, dan Menengah" loading="lazy"
+                  width="100" height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://bpjph.halal.go.id/"><img
+                  src="assets/logos/bpjph.png" alt="Badan Penyelenggara Jaminan Produk Halal" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://bsn.go.id/"><img
+                  src="assets/logos/bsn.svg" alt="Badan Standardisasi Nasional" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.bi.go.id/"><img
+                  src="assets/logos/bi.svg" alt="Bank Indonesia" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.bpjs-kesehatan.go.id/"><img
+                  src="assets/logos/bpjs-kes.svg" alt="BPJS Kesehatan" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.bpjsketenagakerjaan.go.id/"><img
+                  src="assets/logos/bpjs-tk.svg" alt="BPJS Ketenagakerjaan" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.bkpm.go.id/"><img
+                  src="assets/logos/bkpm.svg" alt="Kementerian Investasi dan Hilirisasi/BKPM" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kemenag.go.id/"><img
+                  src="assets/logos/kemenag.svg" alt="Kementerian Agama" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.atrbpn.go.id/"><img
+                  src="assets/logos/atrbpn.png" alt="Kementerian ATR/BPN" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kemendagri.go.id/"><img
+                  src="assets/logos/kemendagri.svg" alt="Kementerian Dalam Negeri" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.esdm.go.id/"><img
+                  src="assets/logos/esdm.png" alt="Kementerian Energi dan Sumber Daya Mineral" loading="lazy"
+                  width="100" height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kemkes.go.id/"><img
+                  src="assets/logos/kemenkes.svg" alt="Kementerian Kesehatan" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kemdiktisaintek.go.id/"><img
+                  src="assets/logos/diktisaintek.png" alt="Kementerian Pendidikan Tinggi, Sains, dan Teknologi"
+                  loading="lazy" width="100" height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.polri.go.id/"><img
+                  src="assets/logos/polri.png" alt="Kepolisian Republik Indonesia" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.pertanian.go.id/"><img
+                  src="assets/logos/kementan.png" alt="Kementerian Pertanian" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.kemendag.go.id/"><img
+                  src="assets/logos/kemendag.png" alt="Kementerian Perdagangan" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.pom.go.id/"><img
+                  src="assets/logos/pom.png" alt="Badan Pengawasan Obat dan Makanan" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.kemenperin.go.id/"><img
+                  src="assets/logos/kemenperin.png" alt="Kementerian Perindustrian" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.kemenkeu.go.id/"><img
+                  src="assets/logos/kemenkeu.png" alt="Kementerian Keuangan" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.komdigi.go.id/"><img
+                  src="assets/logos/komdigi.svg" alt="Kementerian Komunikasi dan Digital" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.kkp.go.id/"><img
+                  src="assets/logos/kkp.jpeg" alt="Kementerian Kelautan dan Perikanan" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.kemnaker.go.id/"><img
+                  src="assets/logos/kemnaker.png" alt="Kementerian Ketenagakerjaan" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kemenpar.go.id/"><img
+                  src="assets/logos/kemenpar.png" alt="Kementerian Pariwisata" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://pu.go.id/"><img
+                  src="assets/logos/pu.svg" alt="Kementerian Pekerjaan Umum" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kemenlh.go.id/"><img
+                  src="assets/logos/klh.png" alt="Kementerian Lingkungan Hidup/BPLH" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://www.bapeten.go.id/"><img
+                  src="assets/logos/bapeten.png" alt="Badan Pengawas Tenaga Nuklir" loading="lazy" width="100"
+                  height="100" class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://dephub.go.id/"><img
+                  src="assets/logos/dephub.png" alt="Kementerian Perhubungan" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+            <div class="z-50"><a target="_blank" rel="noreferrer" href="https://kehutanan.go.id/"><img
+                  src="assets/logos/kehutanan.png" alt="Kementerian Kehutanan" loading="lazy" width="100" height="100"
+                  class="mx-5 h-12 w-auto object-contain grayscale" /></a></div>
+          </div>
+          <div class="gradient-right" aria-hidden="true"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer id="footer" class="bg-oss-red-600 py-8">
+    <div class="mx-auto max-w-1920 px-4 sm:px-10 md:px-16 lg:px-24 xl:px-32">
+      <div class="flex flex-col justify-between gap-8 md:flex-row md:gap-12">
+
+        <div class="flex-1 text-center md:text-left">
+          <img src="assets/footer/bkpm-white.svg" alt="Lembaga OSS - Kementerian Investasi dan Hilirisasi / BKPM"
+            class="mx-auto max-h-[52px] w-auto md:mx-0" />
+          <p class="mt-8 text-center text-sm text-white md:text-left">
+            Jl. Jenderal Gatot Subroto No.44, Jakarta 12190 Indonesia
+          </p>
+          <div class="mt-8 space-y-2 text-white">
+            <a target="_blank" rel="noopener noreferrer"
+              class="flex items-center text-sm text-white no-underline hover:underline"
+              href="https://api.whatsapp.com/send?phone=6281511828000">
+              <img src="assets/footer/whatsapp.svg" alt="" class="mr-2 h-5 w-5" />
+              WhatsApp
+            </a>
+            <a target="_blank" rel="noopener noreferrer"
+              class="flex items-center text-sm text-white no-underline hover:underline" href="mailto:kontak@oss.go.id">
+              <img src="assets/footer/email.svg" alt="" class="mr-2 h-5 w-5" />
+              Email
+            </a>
+            <a target="_blank" rel="noopener noreferrer"
+              class="flex items-center text-sm text-white no-underline hover:underline"
+              href="https://tatapmuka.oss.go.id/token/">
+              <img src="assets/footer/tatap-muka.svg" alt="" class="mr-2 h-5 w-5" />
+              Tatap Muka
+            </a>
+            <a target="_blank" rel="noopener noreferrer"
+              class="flex items-center text-sm text-white no-underline hover:underline"
+              href="https://bit.ly/konsultasiOSS-video">
+              <img src="assets/footer/panggilan-video.svg" alt="" class="mr-2 h-5 w-5" />
+              Panggilan Video
+            </a>
+          </div>
+          <div class="mt-4 flex flex-row gap-2">
+            <a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/oss.go.id/"
+              aria-label="Instagram OSS"
+              class="mt-2 inline-flex items-center justify-center rounded-md p-1 hover:bg-white/10 transition">
+              <img src="assets/footer/instagram.svg" alt="" class="h-5 w-5" />
+            </a>
+            <a target="_blank" rel="noopener noreferrer"
+              href="https://www.facebook.com/people/OSS-Indonesia/100069437169431/" aria-label="Facebook OSS"
+              class="mt-2 inline-flex items-center justify-center rounded-md bg-white p-1 hover:bg-white/90 transition">
+              <img src="assets/footer/facebook.svg" alt="" class="h-5 w-5" />
+            </a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/channel/UCRFWeVKUvheCbQtsICqLjhg"
+              aria-label="YouTube OSS"
+              class="mt-2 inline-flex items-center justify-center rounded-md bg-white p-1 hover:bg-white/90 transition">
+              <img src="assets/footer/youtube.svg" alt="" class="h-5 w-5" />
+            </a>
+            <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/OSS_id" aria-label="Twitter OSS"
+              class="mt-2 inline-flex items-center justify-center rounded-md bg-white p-1 hover:bg-white/90 transition">
+              <img src="assets/footer/twitter.svg" alt="" class="h-5 w-5" />
+            </a>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <div class="text-sm font-bold text-white">Fitur dan Layanan</div>
+          <a class="text-sm font-normal text-white hover:underline"
+            href="https://ui-login.oss.go.id/login/v1?as=pelapor" target="_blank" rel="noreferrer">Pengaduan
+            Masyarakat</a>
+          <a class="text-sm font-normal text-white hover:underline"
+            href="https://www.lapor.go.id/instansi/badan-koordinasi-penanaman-modal-bkpm" target="_blank"
+            rel="noreferrer">Lapor</a>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <div class="text-sm font-bold text-white">Ketentuan &amp; Kebijakan</div>
+          <a class="text-sm font-normal text-white hover:underline" href="https://oss.go.id/id/privacy-policy">Kebijakan
+            Privasi</a>
+          <a class="text-sm font-normal text-white hover:underline" href="https://oss.go.id/id/about-us">Tentang OSS</a>
+        </div>
+
+        <div>
+          <h6 class="mb-4 text-sm font-bold text-white">Pencarian NIB</h6>
+          <p class="mb-2 text-sm text-white">Cek keabsahan NIB yang Anda miliki.</p>
+          <form class="relative" onsubmit="event.preventDefault()">
+            <label for="nib" class="sr-only">Nomor Induk Berusaha</label>
+            <input id="nib" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="13" placeholder="Cari NIB"
+              class="w-full rounded-xl border border-gray-300 px-4 py-2 text-oss-base-black focus:outline-none focus:ring-2 focus:ring-red-500" />
+            <button type="submit" aria-label="Cari NIB"
+              class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-oss-red-600">
+              <span class="ti ti-search text-lg" aria-hidden="true"></span>
+            </button>
+          </form>
+        </div>
+
+      </div>
+      <p class="mt-8 text-center text-sm text-white">
+        © 2025 Lembaga OSS - Kementerian Investasi dan Hilirisasi/BKPM
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Close announcement bar
+    document.querySelector('.bg-yellow-500 button[aria-label="Tutup pengumuman"]')?.addEventListener('click', (e) => {
+      e.currentTarget.closest('.bg-yellow-500').remove();
+    });
+
+    // NIB image slider (auto-play + dots)
+    (function () {
+      const slider = document.getElementById('nib-slider');
+      if (!slider) return;
+      const track = slider.querySelector('.slider-track');
+      const dots = slider.querySelectorAll('.slider-dot');
+      const slides = slider.querySelectorAll('.slider-slide');
+      if (!track || slides.length === 0) return;
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let current = 0;
+      let timer = null;
+
+      function goTo(i) {
+        current = (i + slides.length) % slides.length;
+        track.style.transform = `translateX(-${current * 100}%)`;
+        dots.forEach((d, idx) => d.setAttribute('aria-current', idx === current ? 'true' : 'false'));
+      }
+
+      function start() {
+        if (reduceMotion) return;
+        stop();
+        timer = setInterval(() => goTo(current + 1), 4000);
+      }
+      function stop() {
+        if (timer) { clearInterval(timer); timer = null; }
+      }
+
+      dots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => { goTo(idx); start(); });
+      });
+
+      slider.addEventListener('mouseenter', stop);
+      slider.addEventListener('mouseleave', start);
+      slider.addEventListener('focusin', stop);
+      slider.addEventListener('focusout', start);
+
+      // Pause when off-screen (IntersectionObserver)
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => { e.isIntersecting ? start() : stop(); });
+        }, { threshold: 0.3 });
+        io.observe(slider);
+      } else {
+        start();
+      }
+    })();
+  </script>
+</body>
+
+</html>

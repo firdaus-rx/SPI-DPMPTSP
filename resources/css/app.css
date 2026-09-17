@@ -1,0 +1,151 @@
+@import 'tailwindcss';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.vue';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-primary-50: #fdf3f2;
+    --color-primary-100: #fbe3e0;
+    --color-primary-200: #f6c5c0;
+    --color-primary-300: #ee9d95;
+    --color-primary-400: #e2695d;
+    --color-primary-500: #c03024;
+    --color-primary-600: #8b1c13;
+    --color-primary-700: #74160f;
+    --color-primary-800: #5e120d;
+    --color-primary-900: #3f0c08;
+    --color-primary-950: #280704;
+
+    --color-success-50: #f0fdf4;
+    --color-success-500: #22c55e;
+    --color-success-600: #16a34a;
+    --color-success-700: #15803d;
+
+    --color-warning-50: #fffbeb;
+    --color-warning-500: #f59e0b;
+    --color-warning-600: #d97706;
+
+    --color-danger-50: #fef2f2;
+    --color-danger-500: #ef4444;
+    --color-danger-600: #dc2626;
+    --color-danger-700: #b91c1c;
+
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+}
+
+* {
+    font-family: var(--font-sans);
+}
+
+html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--color-gray-50);
+}
+
+::selection {
+    background-color: var(--color-primary-200);
+    color: var(--color-primary-900);
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-gray-300);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-400);
+}
+
+/* Scrollbar di dalam sidebar gelap */
+.sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(246, 197, 192, 0.35) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(246, 197, 192, 0.35);
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(246, 197, 192, 0.55);
+}
+
+.label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-gray-500);
+    margin-bottom: 0.375rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.input {
+    display: block;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-gray-300);
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-gray-800);
+    background-color: #ffffff;
+    transition: all 0.15s ease;
+}
+
+.input::placeholder {
+    color: var(--color-gray-400);
+}
+
+.input:hover {
+    border-color: var(--color-gray-400);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px rgba(139, 28, 19, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
