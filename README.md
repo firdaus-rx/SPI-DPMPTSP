@@ -1,161 +1,183 @@
 # SPI DPMPTSP Kabupaten Pidie
 
-Sistem Pengawasan Kepatuhan terintegrasi — kelola **Daftar List Sanksi Pencabutan** & **Usulan Pencabutan Perizinan Berusaha** dengan OCR PDF, validasi NIB, dan cetak SP1/Rekap langsung dari hasil impor.
+Sistem Pengawasan Kepatuhan — **Daftar List Sanksi Pencabutan** & **Usulan Pencabutan Perizinan Berusaha** (OCR PDF, validasi NIB, cetak SP1 & Rekap).
 
-- **Welcome Guest** (`/`) dari `public/guest/index.html` — `resources/views/guest/welcome.blade.php:1` (assets tetap `public/guest/assets/*`)
-- **Dashboard** analitik — KPI, sebaran risiko, skala, penanaman modal, top kecamatan/kabupaten, data terbaru
-- **Auth** — hanya login, tanpa register (`app/Http/Controllers/Auth/LoginController.php:1`)
-- **OCR** — Tesseract `ind+eng` + Poppler `pdftoppm` (`config/ocr.php:1`)
-- **Cetak** — SP1 per data/massal checklist + Rekap 6 kolom landscape (`app/Http/Controllers/SanksiAdministratif/Sp1Controller.php:1`, `RekapController.php:1`) — `dompdf/dompdf` stream inline
+> Deployment **Linux + Docker only** — SQLite, port `8050` → container `web:80` (nginx). Tanpa XAMPP/MySQL.
 
-## Fitur Utama
-
-| Modul | Route | Keterangan |
-|-------|-------|------------|
-| Dashboard | `GET /dashboard` | Ringkasan eksekutif pengawasan & usulan |
-| Daftar List Sanksi Pencabutan | `resource /pengawasan` | Tabel `pengawasan` — risiko, status sanksi |
-| Import Pengawasan | `/pengawasan/import` | OCR `OcrPengawasanService` |
-| Usulan Pencabutan PB | `resource /sanksi-administratif` | Tabel `sanksi_administratif` — `no, nib, alamat nested, penanaman_modal, skala` |
-| Import Usulan | `/sanksi-administratif/import` | OCR `OcrSanksiAdministratifService` — handle `v 2 NAMA` + NIB split + `No.1]` |
-| Cetak SP1 | `/{id}/sp1`, `/sp1/cetak?ids=1,2` | `template/sp1.blade.php:1` — stream PDF F4 215×330mm |
-| Rekap | `/rekap/cetak?ids=&search=&skala&kecamatan` | `template/rekap-sanksi.blade.php:1` — landscape 330×215mm, 6 kolom |
-| Auth | `GET /login`, `POST /login`, `POST /logout` | Tanpa register — seeder saja |
-
-Menu & breadcrumb single source: `resources/js/Components/Layout/menu.js:1` (`NAV_SECTIONS`, `breadcrumbs()`)
+---
 
 ## Stack
 
-- **Backend:** Laravel 12.69 (`php ^8.2`), Inertia 3.3, `dompdf/dompdf *`, `mayaram/laravel-ocr`
-- **Frontend:** Vue 3.5 + Inertia Vue3 3.7 + Vite 7 + Tailwind 4 + Lucide
-- **DB:** SQLite (`database/database.sqlite`) — tanpa MySQL
-- **PDF:** `dompdf` stream inline (`Content-Disposition: inline`) + `?download=1` / `?html=1`
-- **OCR:** `tesseract` + `poppler-utils` (`pdftoppm -r 300 -png`)
-- **Proxy:** `nginx:1.27-alpine` → `php:8.2-fpm-bookworm`
+- **Backend** Laravel 12.69 (`php 8.2`), Inertia 3.3, `dompdf/dompdf`
+- **Frontend** Vue 3.5 + Vite 7 + Tailwind 4
+- **DB** SQLite `database/database.sqlite` (volume `app_db`)
+- **OCR** `tesseract-ocr` (`ind`+`eng`) + `poppler-utils` (`pdftoppm`) di image
+- **Web** `nginx:1.27-alpine` → `php:8.2-fpm-bookworm`
 
-## Struktur Penting
+---
 
-```
-Dockerfile                         # multi-stage node20 + php8.2-fpm (tesseract ind+eng + poppler + libsqlite3-dev)
-docker-compose.yml                 # app + web (nginx), SQLite, APP_PORT 8050:80
-docker/php/local.ini               # upload 25M, memory 512M
-docker/nginx/default.conf          # try_files + fastcgi_pass app:9000
-docker/entrypoint.sh               # key:generate, migrate --force, db:seed, storage:link, paksa binary Linux
-config/ocr.php                     # driver tesseract, binary, language ind+eng, dpi 300
-app/Services/SanksiAdministratif/  # OcrSanksiAdministratifService (parseOssLayout)
-resources/views/template/sp1.blade.php
-resources/views/template/rekap-sanksi.blade.php
-resources/views/guest/welcome.blade.php  # GET / welcome (auth → dashboard)
-resources/js/Pages/Dashboard.vue
-resources/js/Pages/SanksiAdministratif/* # Index (checklist No 1..) + ImportPdf + Show (Cetak SP1)
-```
+## Prasyarat (Linux)
 
-## Instalasi — Lokal (XAMPP, Host Windows)
+- Docker Engine + Compose v2 (`docker compose version`)
+- Git, `curl`
+- Port `8050` bebas (cek `ss -tulpn | grep 8050` / `docker ps`)
 
-```powershell
-composer install
-Copy-Item .env.example .env
-php artisan key:generate
-php artisan migrate --force
-php artisan db:seed          # admin@dpmptsp.pidie.go.id / password
-npm install
-npm run build                # atau npm run dev
-php artisan serve            # http://localhost:8000
+---
+
+## Deploy — Linux + Docker
+
+### 1. Clone & env
+
+```bash
+git clone https://github.com/firdaus-rx/SPI-DPMPTSP.git spi-dpmptsp
+cd spi-dpmptsp
+cp .env.example .env
+nano .env
 ```
 
-`.env.example` host Windows sudah berisi:
+Wajib isi di `.env`:
 
 ```env
+APP_NAME="SPI DPMPTSP"
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https:/dpmptsp.pidie.pipay.id/   # ganti ke domain Cloudflare Tunnel kamu
+APP_PORT=8050
+
+DB_CONNECTION=sqlite
+DB_DATABASE=/var/www/html/database/database.sqlite
+
+# OCR — di container otomatis di-override ke Linux, biarkan saja
 LARAVEL_OCR_DRIVER=tesseract
-TESSERACT_BINARY="C:\Program Files\Tesseract-OCR\tesseract.exe"
 TESSERACT_LANGUAGE=ind+eng
 TESSERACT_TIMEOUT=60
-POPPLER_BINARY="C:\Users\ASUS\AppData\Local\Microsoft\WinGet\Packages\...\poppler-25.07.0\Library\bin\pdftoppm.exe"
 ```
 
-## Instalasi — Docker (SQLite, tanpa MySQL)
+`.env.example` sudah berisi `APP_PORT=8050` dan path Windows (`C:\...`) — di container ditimpa jadi `/usr/bin/tesseract` & `/usr/bin/pdftoppm` oleh `docker-compose.yml` + `docker/entrypoint.sh`.
 
-```powershell
-Copy-Item .env.example .env
-# APP_KEY akan diisi otomatis oleh entrypoint jika kosong
+### 2. Build & up
 
+```bash
 docker compose up --build -d
+docker compose ps
 docker compose logs -f app
+```
 
-# Buka:
-# http://localhost:8050          -> welcome (guest) / dashboard (auth)
-# http://localhost:8050/login    -> admin@dpmptsp.pidie.go.id / password
+Tunggu `entrypoint` sampai:
 
-# Hentikan:
-docker compose down
+```
+[entrypoint] APP_KEY OK: base64:...
+[entrypoint] SQLite DB: /var/www/html/database/database.sqlite (exists: yes)
+[entrypoint] Cek binary OCR...
+tesseract 5.x
+pdftoppm version 22.x
+ind
+eng
+[entrypoint] Migrate & seed...
+```
 
-# Reset DB (di dalam container):
+### 3. Buka
+
+- `http://SERVER_IP:8050` — welcome `GET /` (`resources/views/guest/welcome.blade.php`)
+- `http://SERVER_IP:8050/login` — `admin@dpmptsp.pidie.go.id / password`
+
+```
+Seeder: database/seeders/AdminUserSeeder.php
+User casts password => hashed — assign plain di seeder
+```
+
+### 4. Update
+
+```bash
+git pull origin main
+docker compose up --build -d
+docker compose exec app php artisan config:clear
+```
+
+### 5. Hentikan / reset
+
+```bash
+docker compose down              # stop, volume tetap
+docker compose down -v           # hapus volume app_db (reset DB)
 docker compose exec app php artisan migrate:fresh --seed --force
 ```
 
-`Dockerfile:16` memasang `tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind poppler-utils libsqlite3-dev pkg-config` + `docker-php-ext-install pdo pdo_sqlite gd zip` — gagal build `Package 'sqlite3' not found` teratasi. `docker/entrypoint.sh:28` memaksa `TESSERACT_BINARY=/usr/bin/tesseract` `POPPLER_BINARY=/usr/bin/pdftoppm` di container (override path Windows).
+---
 
-Volume `docker-compose.yml:22`:
-- `app_storage:/var/www/html/storage` — upload `storage/app/private/import`
-- `app_db:/var/www/html/database` — `database/database.sqlite` persisten
+## Port — `8050:80`
 
-## Konfigurasi OCR
+`docker-compose.yml`:
 
-`config/ocr.php:24`:
-
-```php
-'tesseract' => ['binary' => env('TESSERACT_BINARY', '/usr/bin/tesseract'), 'language' => env('TESSERACT_LANGUAGE', 'ind+eng'), 'timeout' => 60],
-'poppler'   => ['binary' => env('POPPLER_BINARY', '/usr/bin/pdftoppm'), 'dpi' => 300],
+```yaml
+services:
+  web:
+    image: nginx:1.27-alpine
+    ports:
+      - "${APP_PORT:-8050}:80"   # host:8050 → container web:80 (expose tetap 80)
+    depends_on:
+      app:
+        condition: service_started
+  app:
+    build: .
+    expose: [9000]               # php-fpm, tidak dipublish ke host
+    environment:
+      TESSERACT_BINARY: "/usr/bin/tesseract"
+      POPPLER_BINARY: "/usr/bin/pdftoppm"
 ```
 
-- Host: path Windows (di atas)
-- Docker: `docker-compose.yml:12` & `docker/entrypoint.sh:28` override ke `/usr/bin/tesseract` & `/usr/bin/pdftoppm` (Linux)
+| Akses | URL |
+|-------|-----|
+| Lokal server | `http://localhost:8050` |
+| LAN | `http://SERVER_IP:8050` |
+| Cloudflared di host | `--url http://localhost:8050` |
+| Cloudflared di compose | `service: http://web:80` (satu network `spi`) |
 
-Pipeline sanksi `OcrSanksiAdministratifService::parseOssLayout()` — tangkap `v 2 BUMG...`, NIB split `91203009508 + 31 → 9120300950831`, `No.1] → No.11`, blank lines `Kelurahan:` → value.
+> Jangan pointing ke `app:9000` (FastCGI) atau `3306` (tidak ada MySQL).
 
-Verifikasi tanpa PDF:
+Ganti port: edit `.env` `APP_PORT=8051` → `docker compose up -d` (recreate `web`).
 
-```
-php artisan tinker
->>> app(App\Services\SanksiAdministratif\OcrSanksiAdministratifService::class)->parse($textDariLog, 'file.pdf')
-```
+Cek port bentrok:
 
-## Cloudflare Tunnel — Port Pointing
-
-`docker-compose.yml:36` service **web (nginx)** memetakan:
-
-```
-ports:
-  - "${APP_PORT:-8050}:80"
+```bash
+ss -tulpn | grep -E '8050|8020|8010|3000'
+docker ps --format '{{.Names}} {{.Ports}}'
 ```
 
-| Skenario `cloudflared` | Pointing `service` | Keterangan |
-|------------------------|--------------------|------------|
-| **Di host (Windows) — paling umum** | `http://localhost:8050` | `cloudflared` di host meneruskan ke `web` via port host `APP_PORT` |
-| **Di dalam Docker (compose)** | `http://web:80` | `cloudflared` satu network `spi` → langsung ke container `web:80` (bukan `app:9000` php-fpm) |
-| **Reverse proxy lain (Caddy/Nginx host)** | `http://localhost:8050` atau `http://127.0.0.1:8050` | Sama — target `web`, bukan `app` |
+---
 
-> Jangan pointing ke `app:9000` (php-fpm FastCGI) dan jangan ke `3306/3307` (tidak ada MySQL).
+## Cloudflare Tunnel
 
 ### Quick tunnel (host)
 
-```powershell
+```bash
 cloudflared tunnel --url http://localhost:8050
-# akan dapat https://xxx.trycloudflare.com → localhost:8050 → web:80 → app:9000
+# -> https://xxx.trycloudflare.com
 ```
 
-### Config file `config.yml` (host)
+### Tunnel terdaftar
+
+`~/.cloudflared/config.yml`:
 
 ```yaml
 tunnel: <TUNNEL_ID>
-credentials-file: C:\Users\ASUS\.cloudflared\<TUNNEL_ID>.json
-
+credentials-file: /home/<user>/.cloudflared/<TUNNEL_ID>.json
 ingress:
   - hostname: spi.example.com
     service: http://localhost:8050
   - service: http_status:404
 ```
 
-Jalankan: `cloudflared tunnel run spi`
+```bash
+cloudflared tunnel run spi
+```
+
+Env wajib:
+
+```env
+APP_URL=https://spi.example.com
+```
+
+Lalu `docker compose exec app php artisan config:clear`.
 
 ### Cloudflared sebagai service Docker (opsional)
 
@@ -166,56 +188,61 @@ Tambah ke `docker-compose.yml`:
     image: cloudflare/cloudflared:latest
     container_name: spi-cloudflared
     command: tunnel --no-autoupdate run --token <TUNNEL_TOKEN>
-    # atau config file: mount C:\...\config.yml
-    depends_on:
-      web:
-        condition: service_started
-    networks:
-      - spi
+    depends_on: [web]
+    networks: [spi]
     restart: unless-stopped
 ```
 
-Jika pakai token, pointing tetap ke `http://web:80` (internal), bukan `localhost`.
+Pointing jadi `service: http://web:80` (internal).
 
-### Env penting untuk tunnel
+---
 
-```env
-APP_URL=https://spi.example.com   # samakan dengan hostname tunnel agar URL & asset benar
-APP_PORT=8050                      # ganti jika bentrok, lalu pointing ikut ganti localhost:<APP_PORT>
+## Operasional
+
+```bash
+docker compose logs -f app          # laravel log
+docker compose logs -f web          # nginx
+docker compose exec app php artisan route:list --path=sanksi
+docker compose exec app php artisan tinker
+docker compose exec app cat storage/logs/laravel.log | tail -n 100
+docker compose exec app ls -lh storage/app/private/import
 ```
 
-Cek route setelah `APP_URL` diubah: `php artisan config:clear && php artisan route:list --path=sanksi`
+Backup DB (volume):
 
-## Akun Default
-
-Seeder `database/seeders/AdminUserSeeder.php:1`:
-
-```
-admin@dpmptsp.pidie.go.id / password
+```bash
+docker run --rm -v spi-dpmptsp_app_db:/vol -v $(pwd):/backup alpine tar czf /backup/db-$(date +%F).tgz -C /vol .
 ```
 
-`User.php:44` `casts: ['password' => 'hashed']` — seeder assign plain password, model hash otomatis. Ubah via `.env`:
+---
 
-```env
-ADMIN_EMAIL=admin@dpmptsp.pidie.go.id
-ADMIN_PASSWORD=password
+## OCR
+
+- Image: `tesseract-ocr`, `tesseract-ocr-ind`, `tesseract-ocr-eng`, `poppler-utils` (`Dockerfile:16`)
+- Config: `config/ocr.php` — `binary` env, `language=ind+eng`, `dpi=300`
+- Service: `app/Services/SanksiAdministratif/OcrSanksiAdministratifService.php` (`parseOssLayout` — `v 2 NAMA`, NIB split, `No.1]`)
+
+Verifikasi di container:
+
+```bash
+docker compose exec app tesseract --list-langs | grep -E 'ind|eng'
+docker compose exec app pdftoppm -v 2>&1 | head -n 1
 ```
 
-Tanpa register UI — tambah akun edit `AdminUserSeeder` array.
+---
 
-## Alur Cetak
+## Troubleshooting
 
-- **SP1 per data:** `Show` → `Cetak SP1` → `GET /sanksi-administratif/{id}/sp1` → `Sp1Controller.php:17` stream `inline; filename="SP1-<nib>.pdf"` — preview PDF native (Print & Download). `?download=1` → `attachment`, `?html=1` → preview HTML `window.print()`.
-- **SP1 massal:** `Index` checklist `No 1..` (`sanksi.from + index`) → `Cetak SP1 (n)` → `?ids=1,2,5` → `Sp1Controller.php:24` `whereIn(ids)` stream `SP1-massal-N-data.pdf`. Header checkbox `allChecked` `Index.vue:103`.
-- **Rekap:** `Cetak Rekap` → `GET /sanksi-administratif/rekap/cetak?ids=&search=&skala_usaha=&kecamatan` → `RekapController.php:1` — jika ada `ids` pakai terpilih, else filter. Template `rekap-sanksi.blade.php:1` landscape, 6 kolom `No | Pelaku Usaha | NIB | Penanaman Modal | Skala | Lokasi`, tanpa warna/badge — border hitam polos.
+| Error | Solusi |
+|-------|--------|
+| `No application encryption key` | `docker/entrypoint.sh` auto `php artisan key:generate --force` + fallback `openssl rand -base64 32` (butuh `file`/`openssl` di `Dockerfile:16`). Jika masih kosong: `docker compose exec app php artisan key:generate --force && docker compose restart app` |
+| `Package 'sqlite3' not found` | Butuh `libsqlite3-dev` + `pkg-config` — sudah ada di `Dockerfile:16`. Rebuild: `docker compose build --no-cache app` |
+| `port is already allocated` | `APP_PORT` bentrok — ganti `8050` → `8051` di `.env`, `docker compose up -d` |
+| `permission denied` `vendor/composer/tmp-*.zip` | `chmod -R 775 storage bootstrap/cache` sudah di `Dockerfile:49` + `entrypoint.sh:8`; di host: `icacls`/`chmod` jika mount Windows |
+| Build `vite build skipped` | `public/build/manifest.json` belum ada — entrypoint akan `npm ci && npm run build` jika `npm` ada di image; sebaliknya build di host dulu lalu `docker compose build` |
 
-## Catatan Docker
-
-- SQLite saja — tidak ada `mysql:8.0` service (di arsip `docker-compose.mysql.yml.bak` bila perlu).
-- `Dockerfile:29` `tesseract --list-langs | grep ind|eng` memastikan tessdata siap.
-- `docker/php/local.ini:1` `upload_max_filesize 25M` sinkron `ImportPdfController` `max:20480`.
-- `docker/nginx/default.conf:1` `client_max_body_size 25m`, `fastcgi_pass app:9000`.
+---
 
 ## Lisensi
 
-MIT — Laravel framework. Konten & data sanksi milik DPMPTSP Kabupaten Pidie.
+MIT — Laravel. Data sanksi milik DPMPTSP Kabupaten Pidie.
