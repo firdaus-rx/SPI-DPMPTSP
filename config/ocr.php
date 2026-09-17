@@ -39,6 +39,7 @@ return [
 
     'poppler' => [
         'binary' => env('POPPLER_BINARY', 'C:/Users/ASUS/AppData/Local/Microsoft/WinGet/Packages/oschwartz10612.Poppler_Microsoft.Winget.Source_8wekyb3d8bbwe/poppler-25.07.0/Library/bin/pdftoppm.exe'),
-        'dpi' => 300,
+        'dpi' => env('POPPLER_DPI', strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 300 : 300),
+        'timeout' => env('POPPLER_TIMEOUT', 60),
     ],
 ];

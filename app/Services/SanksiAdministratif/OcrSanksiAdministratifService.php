@@ -24,11 +24,19 @@ class OcrSanksiAdministratifService
         'skala_usaha' => ['Skala Usaha', 'Usaha Mikro', 'Usaha Kecil', 'Usaha Menengah', 'Usaha Besar'],
     ];
 
+    private int $tesseractTimeout;
+
     public function __construct()
     {
         $this->tesseractBinary = config('ocr.tesseract.binary', 'C:/Program Files/Tesseract-OCR/tesseract.exe');
         $this->popplerBinary = config('ocr.poppler.binary', 'pdftoppm');
         $this->language = config('ocr.tesseract.language', 'ind+eng');
+        $this->tesseractTimeout = (int) config('ocr.tesseract.timeout', 60);
+    }
+
+    private function envTimeout(): int
+    {
+        return $this->tesseractTimeout > 0 ? $this->tesseractTimeout : 60;
     }
 
     public function getConfidence(): float
@@ -406,7 +414,8 @@ class OcrSanksiAdministratifService
         $sep = $isWin ? '\\' : '/';
         $outputBase = rtrim($tempDir, '/\\') . $sep . $prefix;
         $pdfArg = $isWin ? str_replace('/', '\\', $pdfPath) : $pdfPath;
-        $cmd = sprintf('"%s" -png -r 400 "%s" "%s"', $this->popplerBinary, $pdfArg, $outputBase);
+        $dpi = (int) config('ocr.poppler.dpi', 300);
+        $cmd = sprintf('"%s" -png -r %d "%s" "%s"', $this->popplerBinary, $dpi, $pdfArg, $outputBase);
         exec($cmd . ' 2>&1', $output, $rc);
         if ($rc !== 0) {
             Log::warning('pdftoppm sanksi failed', ['cmd' => $cmd, 'rc' => $rc, 'output' => $output]);

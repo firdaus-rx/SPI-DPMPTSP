@@ -32,11 +32,17 @@ class ImportPdfController extends Controller
             'file_pdf' => 'required|file|mimes:pdf,jpg,jpeg,png,bmp,tiff,webp,json|max:20480',
         ]);
 
+        // VPS single-thread artisan serve — naikkan timeout & memory untuk OCR 2 halaman
+        if (function_exists('set_time_limit')) @set_time_limit(180);
+        @ini_set('max_execution_time', '180');
+        @ini_set('memory_limit', '512M');
+
         $file = $request->file('file_pdf');
         $filename = time() . '_' . $file->getClientOriginalName();
         $path = $file->storeAs('import', $filename, 'local');
         $fullPath = Storage::disk('local')->path($path);
 
+        $started = microtime(true);
         $ext = strtolower($file->getClientOriginalExtension());
         if ($ext === 'json') {
             $text = file_get_contents($fullPath);
@@ -48,6 +54,18 @@ class ImportPdfController extends Controller
             }
         } else {
             $results = $this->ocrService->processFile($fullPath, $filename);
+        }
+        $elapsed = round((microtime(true) - $started) * 1000);
+
+        \Illuminate\Support\Facades\Log::info('OCR Sanksi store selesai', ['file' => $filename, 'elapsed_ms' => $elapsed, 'records' => count($results)]);
+
+        // Jika OCR kosong (timeout/gagal), beri pesan jelas bukan hang
+        if (empty($results)) {
+            session([
+                'sanksi_import_results' => [],
+                'sanksi_import_filename' => $filename,
+            ]);
+            return redirect()->route('sanksi-administratif.import')->with('success', 'Dokumen diproses (' . round($elapsed / 1000, 1) . ' dtk) namun tidak ada data yang dapat diekstrak. Coba upload ulang atau gunakan file yang lebih jelas / coba JSON OCR.');
         }
 
         session([
