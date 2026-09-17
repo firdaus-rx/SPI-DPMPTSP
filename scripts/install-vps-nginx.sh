@@ -136,9 +136,20 @@ log "Env OK: APP_URL=$APP_URL APP_PORT=$APP_PORT DB=$DB_FILE"
 log "4/8 — Composer & permissions"
 composer install --no-dev --no-interaction --optimize-autoloader --no-progress
 mkdir -p storage/app/private/import storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views bootstrap/cache database
-touch "$DB_FILE" 2>/dev/null || true
+# Pastikan sqlite file ada & writable oleh www-data (fix attempt to write a readonly database)
+if [ "$DB_FILE" != ":memory:" ]; then
+  case "$DB_FILE" in
+    /*) DB_ABS="$DB_FILE" ;;
+    *)  DB_ABS="$APP_DIR/$DB_FILE" ;;
+  esac
+  mkdir -p "$(dirname "$DB_ABS")" 2>/dev/null || true
+  touch "$DB_ABS" 2>/dev/null || true
+  chown www-data:www-data "$DB_ABS" 2>/dev/null || chown -R www-data:www-data "$(dirname "$DB_ABS")" 2>/dev/null || true
+  chmod 664 "$DB_ABS" 2>/dev/null || true
+  chmod 775 "$(dirname "$DB_ABS")" 2>/dev/null || true
+fi
 chown -R www-data:www-data storage bootstrap/cache database 2>/dev/null || true
-chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+chmod -R 775 storage bootstrap/cache database 2>/dev/null || true
 
 log "5/8 — Frontend build"
 if [ "$SKIP_BUILD" = "1" ] && [ -f public/build/manifest.json ]; then
