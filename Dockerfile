@@ -1,4 +1,14 @@
 # syntax=docker/dockerfile:1
+
+# ── Stage frontend: build Vite (agar public/build ikut ke image) ──
+FROM node:20-alpine AS frontend
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts
+COPY . .
+RUN npm run build || echo "vite build skipped"
+
+# ── Stage app: PHP-FPM + OCR (single deploy inti) ──
 FROM php:8.2-fpm-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -21,9 +31,8 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-interaction --no-scripts --prefer-dist --no-progress || true
 
 COPY . .
-
-# Frontend sudah dibuild di host (npm run build) — cukup salin, jangan install node di image
-# Jika public/build belum ada, entrypoint akan coba npm build bila npm tersedia
+# Vite build dari stage frontend (wajib — host tidak perlu npm)
+COPY --from=frontend /app/public/build ./public/build
 
 COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
 

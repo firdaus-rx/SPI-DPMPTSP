@@ -18,4 +18,5 @@ Thumbs.db
 .vscode
 public/hot
 public/storage
+!public/build
 docker-compose.override.yml
