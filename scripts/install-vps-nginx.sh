@@ -12,7 +12,7 @@ DOMAIN="${DOMAIN:-dpmptsp.pidie.pipay.id}"
 APP_URL="${APP_URL:-https://$DOMAIN}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-admin@dpmptsp.pidie.go.id}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-password}"
-PHP_VERSION="${PHP_VERSION:-8.2}"
+PHP_VERSION="${PHP_VERSION:-auto}"
 BRANCH="${BRANCH:-main}"
 SKIP_OCR="${SKIP_OCR:-0}"
 SKIP_BUILD="${SKIP_BUILD:-0}"   # 1 = skip npm run build (jika public/build sudah ada di repo)
@@ -31,16 +31,35 @@ need_root(){
 
 need_root
 
+# Auto-detect PHP: Ubuntu Noble (24.04) default 8.3, bukan 8.2 — fallback otomatis
+if [ "$PHP_VERSION" = "auto" ] || ! apt-cache policy php${PHP_VERSION}-fpm 2>/dev/null | grep -q "Candidate: [0-9]"; then
+  DETECTED=""
+  for v in 8.4 8.3 8.2 8.1; do
+    if apt-cache policy php${v}-fpm 2>/dev/null | grep -q "Candidate: [0-9]"; then DETECTED="$v"; break; fi
+  done
+  if [ -n "$DETECTED" ] && [ "$DETECTED" != "$PHP_VERSION" ]; then
+    warn "php${PHP_VERSION}-fpm tidak tersedia, pakai php${DETECTED}-fpm (Ubuntu $(lsb_release -rs 2>/dev/null || echo Noble))"
+    PHP_VERSION="$DETECTED"
+  elif [ -z "$DETECTED" ]; then
+    warn "Tidak ada php-fpm candidate, tambah PPA ondrej/php..."
+    apt-get install -y software-properties-common
+    add-apt-repository -y ppa:ondrej/php
+    apt-get update
+    for v in 8.4 8.3 8.2; do if apt-cache policy php${v}-fpm 2>/dev/null | grep -q "Candidate: [0-9]"; then DETECTED="$v"; break; fi; done
+    [ -n "$DETECTED" ] && PHP_VERSION="$DETECTED"
+  fi
+fi
+log "PHP versi terpilih: $PHP_VERSION"
+
 log "1/8 — Update & deps (nginx, php$PHP_VERSION-fpm, sqlite, tesseract, poppler, nodejs)"
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-  git curl zip unzip pkg-config file openssl ca-certificates \
+  git curl zip unzip pkg-config file openssl ca-certificates lsb-release \
   nginx \
   php${PHP_VERSION}-fpm php${PHP_VERSION}-cli php${PHP_VERSION}-common \
   php${PHP_VERSION}-mbstring php${PHP_VERSION}-xml php${PHP_VERSION}-zip \
   php${PHP_VERSION}-gd php${PHP_VERSION}-sqlite3 php${PHP_VERSION}-curl \
-  php${PHP_VERSION}-bcmath php${PHP_VERSION}-tokenizer php${PHP_VERSION}-ctype \
-  php${PHP_VERSION}-fileinfo php${PHP_VERSION}-opcache php${PHP_VERSION}-readline \
+  php${PHP_VERSION}-bcmath \
   sqlite3 libsqlite3-dev \
   tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind poppler-utils
 
