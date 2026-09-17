@@ -31,7 +31,10 @@ need_root(){
 
 need_root
 
-# Auto-detect PHP: Ubuntu Noble (24.04) default 8.3, bukan 8.2 — fallback otomatis
+log "1/8 — Update & deps (nginx, php-fpm, sqlite, tesseract, poppler, nodejs)"
+apt-get update
+
+# Auto-detect PHP: Ubuntu Noble (24.04) default 8.3, bukan 8.2 — jalankan SETELAH apt-get update
 if [ "$PHP_VERSION" = "auto" ] || ! apt-cache policy php${PHP_VERSION}-fpm 2>/dev/null | grep -q "Candidate: [0-9]"; then
   DETECTED=""
   for v in 8.4 8.3 8.2 8.1; do
@@ -46,13 +49,15 @@ if [ "$PHP_VERSION" = "auto" ] || ! apt-cache policy php${PHP_VERSION}-fpm 2>/de
     add-apt-repository -y ppa:ondrej/php
     apt-get update
     for v in 8.4 8.3 8.2; do if apt-cache policy php${v}-fpm 2>/dev/null | grep -q "Candidate: [0-9]"; then DETECTED="$v"; break; fi; done
-    [ -n "$DETECTED" ] && PHP_VERSION="$DETECTED"
+    if [ -n "$DETECTED" ]; then PHP_VERSION="$DETECTED"; else PHP_VERSION="8.3"; warn "Fallback paksa ke php8.3"; fi
   fi
 fi
+# Fallback terakhir — jangan biarkan auto lolos ke apt-get
+if [ "$PHP_VERSION" = "auto" ]; then
+  warn "auto-detect gagal, fallback ke 8.3"
+  PHP_VERSION="8.3"
+fi
 log "PHP versi terpilih: $PHP_VERSION"
-
-log "1/8 — Update & deps (nginx, php$PHP_VERSION-fpm, sqlite, tesseract, poppler, nodejs)"
-apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
   git curl zip unzip pkg-config file openssl ca-certificates lsb-release \
   nginx \
