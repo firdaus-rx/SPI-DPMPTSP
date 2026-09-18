@@ -104,13 +104,21 @@
 
   <main>
     <!-- Hero -->
-    <section aria-labelledby="hero-title" class="relative overflow-hidden bg-[#8b1c13] py-16 md:py-24">
+    <section aria-labelledby="hero-title" class="relative overflow-hidden bg-[#8b1c13] py-6 lg:py-24">
       <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
         <img src="{{ asset('guest/assets/images/grid-pattern.svg') }}" alt="" class="h-full w-full object-cover opacity-30" />
         <img src="{{ asset('guest/assets/images/garis-abu.svg') }}" alt="" class="absolute inset-0 h-full w-full object-cover mix-blend-screen opacity-20" />
       </div>
-      <div class="relative mx-auto max-w-1920 px-4 sm:px-10 md:px-16 lg:px-24 xl:px-32">
-        <div class="max-w-3xl">
+      <div class="relative mx-auto max-w-1920 px-4 sm:px-10 md:px-16 lg:px-24 xl:px-32 flex flex-col lg:block">
+        <figure class="flex order-first w-full flex-row items-center gap-4 rounded-2xl bg-white/10 p-4 text-left backdrop-blur-sm ring-1 ring-white/20 mb-4 lg:mx-0 lg:mb-0 lg:mt-0 lg:w-auto lg:max-w-xs lg:flex-col lg:gap-3 lg:p-5 lg:text-center lg:absolute lg:right-6 lg:top-1/2 lg:-translate-y-1/2">
+          <img src="{{ asset('guest/assets/images/Kepala_DPMPTSP.jpg') }}" alt="PLT. Kepala DPMPTSP Kabupaten Pidie" width="180" height="180" loading="lazy" class="h-20 w-20 shrink-0 rounded-full object-cover ring-4 ring-white/40 shadow-lg sm:h-24 sm:w-24 lg:h-44 lg:w-44" />
+          <figcaption class="text-white leading-tight lg:leading-none">
+            <p class="text-base font-bold sm:text-lg lg:text-xl">Sri Rahayu, S.E</p>
+            <p class="mt-0.5 text-[11px] font-semibold uppercase tracking-wider text-white/70 lg:mt-1 lg:text-xs">PLT. Kepala DPMPTSP</p>
+            <p class="font-system text-sm text-white/80">Kabupaten Pidie</p>
+          </figcaption>
+        </figure>
+        <div class="max-w-3xl order-last lg:order-none">
           <p class="text-sm font-semibold tracking-widest text-white/80">DPMPTSP KABUPATEN PIDIE</p>
           <h1 id="hero-title" class="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white">Sistem Pengawasan Kepatuhan<br><span class="text-white/90">Terintegrasi &amp; Akuntabel</span></h1>
           <p class="font-system mt-4 text-sm sm:text-base font-medium text-white/80">Kelola Daftar List Sanksi Pencabutan &amp; Usulan Pencabutan Perizinan Berusaha — OCR PDF, validasi NIB, dan cetak SP1/Rekap langsung.</p>
@@ -122,20 +130,7 @@
             @endauth
             <a href="#layanan" class="inline-flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/20">Pelajari Layanan</a>
           </div>
-          <div class="mt-6 flex flex-wrap gap-2 text-xs font-medium text-white/70">
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 backdrop-blur"><span class="ti ti-shield-check"></span> OCR Sanksi</span>
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 backdrop-blur"><span class="ti ti-file-text"></span> Cetak SP1</span>
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 backdrop-blur"><span class="ti ti-table"></span> Rekap 6 Kolom</span>
-          </div>
         </div>
-        <figure class="absolute right-6 top-1/2 hidden -translate-y-1/2 flex-col items-center gap-3 rounded-2xl bg-white/10 p-5 backdrop-blur-sm ring-1 ring-white/20 lg:flex max-w-xs text-center">
-          <img src="{{ asset('guest/assets/images/Kepala_DPMPTSP.jpg') }}" alt="PLT. Kepala DPMPTSP Kabupaten Pidie" width="180" height="180" loading="lazy" class="h-36 w-36 md:h-44 md:w-44 rounded-full object-cover ring-4 ring-white/40 shadow-lg" />
-          <figcaption class="text-white leading-none">
-            <p class="text-lg md:text-xl font-bold">Sri Rahayu, S.E</p>
-            <p class="text-xs font-semibold uppercase tracking-wider text-white/70">PLT. Kepala DPMPTSP</p>
-            <p class="font-system text-sm text-white/80">Kabupaten Pidie</p>
-          </figcaption>
-        </figure>
       </div>
     </section>
 
@@ -179,7 +174,7 @@
         <h2 class="text-lg font-bold md:text-xl">Fitur Utama</h2>
         <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div class="rounded-xl border border-gray-200 p-5"><div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600"><span class="ti ti-list"></span></div><h3 class="mt-3 font-semibold">Daftar List Sanksi Pencabutan</h3><p class="mt-1 text-sm text-gray-500">Kelola pengawasan lengkap dengan risiko &amp; status sanksi.</p></div>
-          <div class="rounded-xl border border-gray-200 p-5"><div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><span class="ti ti-scale"></span></div><h3 class="mt-3 font-semibold">Usulan Pencabutan PB</h3><p class="mt-1 text-sm text-gray-500">OCR NIB/alamat terintegrasi, 5 data contoh Pidie.</p></div>
+          <div class="rounded-xl border border-gray-200 p-5"><div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><span class="ti ti-scale"></span></div><h3 class="mt-3 font-semibold">Usulan Pencabutan PB</h3><p class="mt-1 text-sm text-gray-500">OCR NIB/alamat terintegrasi.</p></div>
           <div class="rounded-xl border border-gray-200 p-5"><div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-white"><span class="ti ti-printer"></span></div><h3 class="mt-3 font-semibold">Cetak SP1 &amp; Rekap</h3><p class="mt-1 text-sm text-gray-500">Checklist → stream PDF F4 &amp; landscape 6 kolom.</p></div>
         </div>
       </section>

@@ -31,7 +31,7 @@
         <!-- Area konten -->
         <div
             class="flex min-h-screen flex-col transition-[padding] duration-300 ease-out"
-            :class="sidebarOpen ? 'lg:pl-60' : 'lg:pl-16'"
+            :class="sidebarOpen ? 'lg:pl-56' : 'lg:pl-14'"
         >
             <TopNavbar @menu="mobileOpen = true" />
 
