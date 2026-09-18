@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>SPI DPMPTSP Kabupaten Pidie — Sistem Pengawasan Kepatuhan</title>
-  <meta name="description" content="Sistem Pengawasan Kepatuhan DPMPTSP Kabupaten Pidie — daftar list sanksi pencabutan & usulan pencabutan perizinan berusaha. Integrasi OCR & cetak SP1/rekap." />
+  <meta name="description" content="Sistem Pengawasan Kepatuhan DPMPTSP Kabupaten Pidie — daftar list sanksi pencabutan & usulan pencabutan perizinan berusaha. Integrasi OCR & cetak SP/rekap." />
   <meta name="theme-color" content="#8b1c13" />
   <link rel="icon" href="{{ asset('guest/assets/favicon.ico') }}" sizes="any" />
   <link rel="stylesheet" href="{{ asset('guest/assets/montserrat.css') }}" />
@@ -121,7 +121,7 @@
         <div class="max-w-3xl order-last lg:order-none">
           <p class="text-sm font-semibold tracking-widest text-white/80">DPMPTSP KABUPATEN PIDIE</p>
           <h1 id="hero-title" class="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white">Sistem Pengawasan Kepatuhan<br><span class="text-white/90">Terintegrasi &amp; Akuntabel</span></h1>
-          <p class="font-system mt-4 text-sm sm:text-base font-medium text-white/80">Kelola Daftar List Sanksi Pencabutan &amp; Usulan Pencabutan Perizinan Berusaha — OCR PDF, validasi NIB, dan cetak SP1/Rekap langsung.</p>
+          <p class="font-system mt-4 text-sm sm:text-base font-medium text-white/80">Kelola Daftar List Sanksi Pencabutan &amp; Usulan Pencabutan Perizinan Berusaha — OCR PDF, validasi NIB, dan cetak SP/Rekap langsung.</p>
           <div class="mt-8 flex flex-wrap gap-3">
             @auth
               <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-[#8b1c13] hover:bg-white/90">Ke Dashboard <span class="ti ti-arrow-right"></span></a>
@@ -148,7 +148,7 @@
         </div>
         <div class="mt-6 md:mt-0 md:w-1/2 md:pl-10">
           <h2 class="text-[28px] md:text-[32px] font-bold leading-tight text-[#8b1c13]">Pengawasan kepatuhan <span class="text-black">yang mudah dipantau</span></h2>
-          <p class="mt-3 text-sm leading-relaxed text-gray-600">Impor PDF sanksi, ekstrak otomatis (NIB, alamat, skala, penanaman modal) via OCR, lalu cetak SP1 per data &amp; rekap tabel 6 kolom langsung dari filter — semua terintegrasi di satu dashboard.</p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-600">Impor PDF sanksi, ekstrak otomatis (NIB, alamat, skala, penanaman modal) via OCR, lalu cetak SP per data &amp; rekap tabel 6 kolom langsung dari filter — semua terintegrasi di satu dashboard.</p>
           <div class="mt-5 flex flex-wrap gap-2">
             @auth
               <a href="{{ route('sanksi-administratif.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-[#8b1c13] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#74160f]">Kelola Usulan <span class="ti ti-arrow-right"></span></a>
@@ -175,7 +175,7 @@
         <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div class="rounded-xl border border-gray-200 p-5"><div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600"><span class="ti ti-list"></span></div><h3 class="mt-3 font-semibold">Daftar List Sanksi Pencabutan</h3><p class="mt-1 text-sm text-gray-500">Kelola pengawasan lengkap dengan risiko &amp; status sanksi.</p></div>
           <div class="rounded-xl border border-gray-200 p-5"><div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><span class="ti ti-scale"></span></div><h3 class="mt-3 font-semibold">Usulan Pencabutan PB</h3><p class="mt-1 text-sm text-gray-500">OCR NIB/alamat terintegrasi.</p></div>
-          <div class="rounded-xl border border-gray-200 p-5"><div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-white"><span class="ti ti-printer"></span></div><h3 class="mt-3 font-semibold">Cetak SP1 &amp; Rekap</h3><p class="mt-1 text-sm text-gray-500">Checklist → stream PDF F4 &amp; landscape 6 kolom.</p></div>
+          <div class="rounded-xl border border-gray-200 p-5"><div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 text-white"><span class="ti ti-printer"></span></div><h3 class="mt-3 font-semibold">Cetak SP &amp; Rekap</h3><p class="mt-1 text-sm text-gray-500">Checklist → stream PDF F4 &amp; landscape 6 kolom.</p></div>
         </div>
       </section>
 
